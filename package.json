@@ -1,0 +1,67 @@
+{
+  "name": "figma-dev-bridge",
+  "version": "1.0.0",
+  "description": "Client-agnostic MCP server that exposes live Figma design context (selection, colors, text, spacing tokens, variables, prototype interactions, and on-demand node navigation) to any AI agent that supports the Model Context Protocol.",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "figma-dev-bridge": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "figma-plugin",
+    "client-config-examples",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "build:plugin": "cd figma-plugin && tsc -p tsconfig.json",
+    "build:all": "npm run build && npm run build:plugin",
+    "watch:plugin": "cd figma-plugin && tsc -p tsconfig.json --watch",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "npm run build && node --test test/*.test.js",
+    "prepublishOnly": "npm run build:all"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "figma",
+    "figma-plugin",
+    "ai",
+    "design-tokens",
+    "claude",
+    "cursor",
+    "opencode",
+    "design-to-code"
+  ],
+  "author": "Cristina Fores Campos",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CristinaFores/figma-dev-bridge.git"
+  },
+  "homepage": "https://github.com/CristinaFores/figma-dev-bridge#readme",
+  "bugs": {
+    "url": "https://github.com/CristinaFores/figma-dev-bridge/issues"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "@figma/eslint-plugin-figma-plugins": "*",
+    "@figma/plugin-typings": "*",
+    "@types/node": "^22.0.0",
+    "eslint": "^9.39.4",
+    "tsx": "^4.19.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.57.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,19 @@
+# Dependencies
+node_modules
+
+# Build output (MCP server)
+dist/
+out/
+
+# Logs
+*.log
+*.log.*
+
+# OS
+.DS_Store
+
+# Runtime state (file-based bridge store)
+figma-context-*.json
+
+# Note: figma-plugin/code.js IS committed so the plugin can be imported
+# into Figma without a build step.
