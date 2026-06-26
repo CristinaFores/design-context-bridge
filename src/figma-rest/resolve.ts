@@ -1,5 +1,5 @@
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { parseFigmaUrl, fetchFile, fetchNodes, fetchLocalVariables } from './client.js';
+import { parseFigmaUrl, fetchFile, fetchNodes, fetchLocalVariables, fetchImages, downloadText } from './client.js';
 import { extractDesignSystem, analyzeStructure, describeComponentVariants } from './analysis.js';
 
 /** Run a REST resolver and wrap its result (or error) as a CallToolResult. */
@@ -223,4 +223,85 @@ export async function restGetComponentVariants(url: string, idOverride?: string)
   const node = await getNodeDocument(fileKey, targetId);
   if (!node) return { error: `Node ${targetId} not found in file ${fileKey}.` };
   return describeComponentVariants(node);
+}
+
+/** Turn a layer name into a safe asset filename (without extension). */
+function toFilename(name: string): string {
+  return name.trim().toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'asset';
+}
+
+/**
+ * Export nodes as images. For SVG the source is inlined (ready to write to a
+ * file); for png/jpg the Figma render URL is returned (download it client-side).
+ */
+export async function restExportImage(
+  url: string,
+  ids: string[] | undefined,
+  format: 'svg' | 'png' | 'jpg',
+  scale: number,
+): Promise<unknown> {
+  const { fileKey, nodeId } = parseFigmaUrl(url);
+  const targetIds = ids && ids.length > 0 ? ids : nodeId ? [nodeId] : [];
+  if (targetIds.length === 0) {
+    return { error: 'Provide node ids — in "ids", or a single one via the URL ?node-id=.' };
+  }
+
+  const { images, err } = await fetchImages(fileKey, targetIds, format, scale);
+  if (err) return { error: `Figma image export error: ${err}` };
+
+  // Resolve names for nice filenames (one nodes call covers all targets).
+  const nodesResult = (await fetchNodes(fileKey, targetIds)) as {
+    nodes?: Record<string, { document?: FigmaNode } | undefined>;
+  };
+
+  const assets = await Promise.all(
+    targetIds.map(async (id) => {
+      const name = nodesResult.nodes?.[id]?.document?.name ?? id;
+      const renderUrl = images[id];
+      const base = { id, name, filename: `${toFilename(name)}.${format}` };
+      if (!renderUrl) return { ...base, error: 'No render produced for this node.' };
+      if (format === 'svg') {
+        try {
+          return { ...base, format, svg: await downloadText(renderUrl) };
+        } catch (e) {
+          return { ...base, format, url: renderUrl, note: `Inline failed: ${(e as Error).message}` };
+        }
+      }
+      return { ...base, format, url: renderUrl, scale };
+    }),
+  );
+
+  return { count: assets.length, assets };
+}
+
+const ICON_NAME = /\b(icon|ic|logo|glyph)\b/i;
+
+/**
+ * Find nodes worth exporting as assets: anything with explicit export settings,
+ * plus vectors and icon/logo-named nodes. Returns ids ready for export_image.
+ */
+export async function restFindAssets(url: string): Promise<unknown> {
+  const { fileKey } = parseFigmaUrl(url);
+  const root = await getDocument(fileKey);
+  const assets: Array<{ id: string; name: string; type: string; suggestedFilename: string; reason: string }> = [];
+  const seen = new Set<string>();
+
+  walk(root, (n) => {
+    if (seen.has(n.id)) return;
+    const exportSettings = (n as { exportSettings?: unknown[] }).exportSettings;
+    let reason = '';
+    if (Array.isArray(exportSettings) && exportSettings.length > 0) reason = 'has export settings';
+    else if (n.type === 'VECTOR') reason = 'vector';
+    else if ((n.type === 'COMPONENT' || n.type === 'INSTANCE' || n.type === 'FRAME') && ICON_NAME.test(n.name)) {
+      reason = 'icon/logo by name';
+    }
+    if (reason) {
+      seen.add(n.id);
+      assets.push({ id: n.id, name: n.name, type: n.type, suggestedFilename: `${toFilename(n.name)}.svg`, reason });
+    }
+  });
+
+  return { count: assets.length, assets };
 }

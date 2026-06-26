@@ -18,6 +18,8 @@ import { GET_NODE_FROM_URL, getNodeFromUrlDefinition, handleGetNodeFromUrl } fro
 import { EXTRACT_DESIGN_SYSTEM, extractDesignSystemDefinition, handleExtractDesignSystem } from '../figma-rest/tools/extract-design-system.js';
 import { ANALYZE_STRUCTURE, analyzeStructureDefinition, handleAnalyzeStructure } from '../figma-rest/tools/analyze-structure.js';
 import { GET_COMPONENT_VARIANTS, getComponentVariantsDefinition, handleGetComponentVariants } from '../figma-rest/tools/get-component-variants.js';
+import { EXPORT_IMAGE, exportImageDefinition, handleExportImage } from '../figma-rest/tools/export-image.js';
+import { FIND_ASSETS, findAssetsDefinition, handleFindAssets } from '../figma-rest/tools/find-assets.js';
 
 export function registerTools(server: Server): void {
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
@@ -40,6 +42,8 @@ export function registerTools(server: Server): void {
       extractDesignSystemDefinition,
       analyzeStructureDefinition,
       getComponentVariantsDefinition,
+      exportImageDefinition,
+      findAssetsDefinition,
     ],
   }));
 
@@ -64,6 +68,8 @@ export function registerTools(server: Server): void {
       case EXTRACT_DESIGN_SYSTEM:     return handleExtractDesignSystem(args as Record<string, unknown>);
       case ANALYZE_STRUCTURE:         return handleAnalyzeStructure(args as Record<string, unknown>);
       case GET_COMPONENT_VARIANTS:    return handleGetComponentVariants(args as Record<string, unknown>);
+      case EXPORT_IMAGE:              return handleExportImage(args as Record<string, unknown>);
+      case FIND_ASSETS:              return handleFindAssets(args as Record<string, unknown>);
       default:
         return { content: [{ type: 'text', text: `Unknown tool: ${name}` }], isError: true };
     }

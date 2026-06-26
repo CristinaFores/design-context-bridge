@@ -54,8 +54,18 @@ export async function fetchImages(
   nodeIds: string[],
   format: 'svg' | 'png' | 'jpg' = 'svg',
   scale = 1,
-): Promise<unknown> {
+): Promise<{ images: Record<string, string | null>; err?: string }> {
   const ids = nodeIds.map((id) => encodeURIComponent(id)).join(',');
   const scaleQuery = format === 'svg' ? '' : `&scale=${scale}`;
-  return figmaFetch(`/images/${fileKey}?ids=${ids}&format=${format}${scaleQuery}`);
+  return figmaFetch(`/images/${fileKey}?ids=${ids}&format=${format}${scaleQuery}`) as Promise<{
+    images: Record<string, string | null>;
+    err?: string;
+  }>;
+}
+
+/** Download the raw text body of a render URL (used to inline SVG source). */
+export async function downloadText(url: string): Promise<string> {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Asset download failed (${res.status}) for ${url}`);
+  return res.text();
 }
