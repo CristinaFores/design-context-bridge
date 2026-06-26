@@ -131,9 +131,16 @@ scan_nodes_by_types { types: ["INSTANCE"] } # find all component instances
 
 ### Mode 3 — Read by URL (no plugin needed)
 
-Pass any Figma URL. Requires a Figma personal access token — get it at **Figma → Settings → Security → Access tokens**.
+Pass any Figma URL directly — no plugin, no selection needed.
 
-Add it to your MCP client config:
+**Step 1 — Get a Figma personal access token**
+
+1. Open Figma desktop (or figma.com)
+2. Click your avatar → **Settings → Security**
+3. Scroll to **Personal access tokens → Generate new token**
+4. Give it a name (e.g. `figma-dev-bridge`) and copy it
+
+**Step 2 — Add it to your MCP client config**
 
 **Claude Code / Cursor / Claude Desktop**
 ```json
