@@ -131,8 +131,43 @@ scan_nodes_by_types { types: ["INSTANCE"] } # find all component instances
 
 ### Mode 3 — Read by URL (no plugin needed)
 
-Pass any Figma URL. Requires `FIGMA_ACCESS_TOKEN` in your environment.
+Pass any Figma URL. Requires a Figma personal access token — get it at **Figma → Settings → Security → Access tokens**.
 
+Add it to your MCP client config:
+
+**Claude Code / Cursor / Claude Desktop**
+```json
+{
+  "mcpServers": {
+    "figma-dev-bridge": {
+      "command": "npx",
+      "args": ["-y", "figma-dev-bridge"],
+      "type": "stdio",
+      "env": {
+        "FIGMA_ACCESS_TOKEN": "your-token-here"
+      }
+    }
+  }
+}
+```
+
+**OpenCode**
+```json
+{
+  "mcp": {
+    "figma-dev-bridge": {
+      "type": "local",
+      "command": ["npx", "-y", "figma-dev-bridge"],
+      "enabled": true,
+      "env": {
+        "FIGMA_ACCESS_TOKEN": "your-token-here"
+      }
+    }
+  }
+}
+```
+
+Then ask the AI:
 ```
 get_file_from_url { url: "https://www.figma.com/design/ABC123/..." }
 get_node_from_url { url: "https://www.figma.com/design/ABC123/...?node-id=0-1" }
