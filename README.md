@@ -1,7 +1,7 @@
 # Design Context Bridge
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/CristinaFores/design-context-bridge/main/.github/cover.svg" alt="Design Context Bridge — an independent MCP server that connects Figma design context to AI coding agents. Not affiliated with Figma." width="100%"/>
+  <img src="https://raw.githubusercontent.com/CristinaFores/design-context-bridge/main/.github/cover.png" alt="Design Context Bridge — an independent MCP server that connects Figma design context to AI coding agents. Not affiliated with Figma." width="100%"/>
 </p>
 
 <p align="center"><code>npm i -g design-context-bridge</code> · An independent MCP server for Figma</p>
