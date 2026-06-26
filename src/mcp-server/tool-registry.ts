@@ -15,6 +15,9 @@ import { GET_NODES_INFO, getNodesInfoDefinition, handleGetNodesInfo } from './to
 import { SCAN_NODES_BY_TYPES, scanNodesByTypesDefinition, handleScanNodesByTypes } from './tools/scan-nodes-by-types.js';
 import { GET_FILE_FROM_URL, getFileFromUrlDefinition, handleGetFileFromUrl } from '../figma-rest/tools/get-file-from-url.js';
 import { GET_NODE_FROM_URL, getNodeFromUrlDefinition, handleGetNodeFromUrl } from '../figma-rest/tools/get-node-from-url.js';
+import { EXTRACT_DESIGN_SYSTEM, extractDesignSystemDefinition, handleExtractDesignSystem } from '../figma-rest/tools/extract-design-system.js';
+import { ANALYZE_STRUCTURE, analyzeStructureDefinition, handleAnalyzeStructure } from '../figma-rest/tools/analyze-structure.js';
+import { GET_COMPONENT_VARIANTS, getComponentVariantsDefinition, handleGetComponentVariants } from '../figma-rest/tools/get-component-variants.js';
 
 export function registerTools(server: Server): void {
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
@@ -34,6 +37,9 @@ export function registerTools(server: Server): void {
       scanNodesByTypesDefinition,
       getFileFromUrlDefinition,
       getNodeFromUrlDefinition,
+      extractDesignSystemDefinition,
+      analyzeStructureDefinition,
+      getComponentVariantsDefinition,
     ],
   }));
 
@@ -55,6 +61,9 @@ export function registerTools(server: Server): void {
       case SCAN_NODES_BY_TYPES:       return handleScanNodesByTypes(args as Record<string, unknown>);
       case GET_FILE_FROM_URL:         return handleGetFileFromUrl(args as Record<string, unknown>);
       case GET_NODE_FROM_URL:         return handleGetNodeFromUrl(args as Record<string, unknown>);
+      case EXTRACT_DESIGN_SYSTEM:     return handleExtractDesignSystem(args as Record<string, unknown>);
+      case ANALYZE_STRUCTURE:         return handleAnalyzeStructure(args as Record<string, unknown>);
+      case GET_COMPONENT_VARIANTS:    return handleGetComponentVariants(args as Record<string, unknown>);
       default:
         return { content: [{ type: 'text', text: `Unknown tool: ${name}` }], isError: true };
     }

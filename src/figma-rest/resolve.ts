@@ -1,5 +1,6 @@
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { parseFigmaUrl, fetchFile, fetchNodes, fetchLocalVariables } from './client.js';
+import { extractDesignSystem, analyzeStructure, describeComponentVariants } from './analysis.js';
 
 /** Run a REST resolver and wrap its result (or error) as a CallToolResult. */
 export async function restResult(fn: () => Promise<unknown>): Promise<CallToolResult> {
@@ -187,4 +188,39 @@ export async function restScanNodesByTypes(
     }
   });
   return { count: found.length, capped: found.length >= 1000, nodes: found };
+}
+
+/** Pick the analysis root: a specific node when given/in the URL, else the whole file. */
+async function getAnalysisRoot(url: string, idOverride?: string): Promise<FigmaNode> {
+  const { fileKey, nodeId } = parseFigmaUrl(url);
+  const targetId = idOverride ?? nodeId;
+  if (targetId) {
+    const node = await getNodeDocument(fileKey, targetId);
+    if (!node) throw new Error(`Node ${targetId} not found in file ${fileKey}.`);
+    return node;
+  }
+  return getDocument(fileKey);
+}
+
+/** Derive a design system (colors, type, spacing, radii, shadows) from a URL. */
+export async function restExtractDesignSystem(url: string, idOverride?: string): Promise<unknown> {
+  return extractDesignSystem(await getAnalysisRoot(url, idOverride));
+}
+
+/** Analyze structure (pages, screens, routes, components) from a URL. */
+export async function restAnalyzeStructure(url: string): Promise<unknown> {
+  const { fileKey } = parseFigmaUrl(url);
+  return analyzeStructure(await getDocument(fileKey));
+}
+
+/** Describe a component and its variants from a URL with a node-id. */
+export async function restGetComponentVariants(url: string, idOverride?: string): Promise<unknown> {
+  const { fileKey, nodeId } = parseFigmaUrl(url);
+  const targetId = idOverride ?? nodeId;
+  if (!targetId) {
+    return { error: 'Provide a component node id — in the URL (?node-id=) or as "id".' };
+  }
+  const node = await getNodeDocument(fileKey, targetId);
+  if (!node) return { error: `Node ${targetId} not found in file ${fileKey}.` };
+  return describeComponentVariants(node);
 }
