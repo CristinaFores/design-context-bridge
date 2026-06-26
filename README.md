@@ -183,6 +183,15 @@ The plugin must be **open and connected** (green dot) for on-demand tools to res
 | `get_nodes_info` | many `getNodeByIdAsync` | Several nodes by id in one call |
 | `scan_nodes_by_types` | tree walk | Every node matching `types` (e.g. `["TEXT","INSTANCE"]`), capped at 1000 |
 
+### REST API — by URL (no plugin needed)
+
+Requires `FIGMA_ACCESS_TOKEN` in your environment.
+
+| Tool | Returns |
+| --- | --- |
+| `get_file_from_url` | Pages, top-level frames, and metadata from any Figma URL |
+| `get_node_from_url` | A specific node from a URL that includes `?node-id=X-Y` |
+
 ### Typical workflow
 
 ```
@@ -206,6 +215,7 @@ get_node_info { id }                           → inspect one
 | Env var | Default | Notes |
 | --- | --- | --- |
 | `FIGMA_BRIDGE_PORT` | `3055` | Port for the local bridge. **If you change it, you must also change the port hard-coded in `figma-plugin/code.ts`** and rebuild the plugin, since the plugin can't read env vars. |
+| `FIGMA_ACCESS_TOKEN` | — | Personal access token from Figma → Settings → Security → Access tokens. Required only for the URL-based tools (`get_file_from_url`, `get_node_from_url`). |
 
 ---
 
