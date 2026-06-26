@@ -15,6 +15,11 @@ import { GET_NODES_INFO, getNodesInfoDefinition, handleGetNodesInfo } from './to
 import { SCAN_NODES_BY_TYPES, scanNodesByTypesDefinition, handleScanNodesByTypes } from './tools/scan-nodes-by-types.js';
 import { GET_FILE_FROM_URL, getFileFromUrlDefinition, handleGetFileFromUrl } from '../figma-rest/tools/get-file-from-url.js';
 import { GET_NODE_FROM_URL, getNodeFromUrlDefinition, handleGetNodeFromUrl } from '../figma-rest/tools/get-node-from-url.js';
+import { EXTRACT_DESIGN_SYSTEM, extractDesignSystemDefinition, handleExtractDesignSystem } from '../figma-rest/tools/extract-design-system.js';
+import { ANALYZE_STRUCTURE, analyzeStructureDefinition, handleAnalyzeStructure } from '../figma-rest/tools/analyze-structure.js';
+import { GET_COMPONENT_VARIANTS, getComponentVariantsDefinition, handleGetComponentVariants } from '../figma-rest/tools/get-component-variants.js';
+import { EXPORT_IMAGE, exportImageDefinition, handleExportImage } from '../figma-rest/tools/export-image.js';
+import { FIND_ASSETS, findAssetsDefinition, handleFindAssets } from '../figma-rest/tools/find-assets.js';
 
 export function registerTools(server: Server): void {
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
@@ -34,6 +39,11 @@ export function registerTools(server: Server): void {
       scanNodesByTypesDefinition,
       getFileFromUrlDefinition,
       getNodeFromUrlDefinition,
+      extractDesignSystemDefinition,
+      analyzeStructureDefinition,
+      getComponentVariantsDefinition,
+      exportImageDefinition,
+      findAssetsDefinition,
     ],
   }));
 
@@ -41,10 +51,10 @@ export function registerTools(server: Server): void {
     const { name, arguments: args = {} } = request.params;
     switch (name) {
       case GET_CURRENT_SELECTION:     return handleGetCurrentSelection();
-      case GET_CURRENT_PAGE:          return handleGetCurrentPage();
-      case GET_ALL_PAGES:             return handleGetAllPages();
+      case GET_CURRENT_PAGE:          return handleGetCurrentPage(args as Record<string, unknown>);
+      case GET_ALL_PAGES:             return handleGetAllPages(args as Record<string, unknown>);
       case GET_FRAME_BY_NAME:         return handleGetFrameByName(args as Record<string, unknown>);
-      case GET_COMPONENT_DEFINITIONS: return handleGetComponentDefinitions();
+      case GET_COMPONENT_DEFINITIONS: return handleGetComponentDefinitions(args as Record<string, unknown>);
       case GET_SELECTED_COLORS:       return handleGetSelectedColors();
       case GET_SELECTED_TEXTS:        return handleGetSelectedTexts();
       case GET_VARIABLES:             return handleGetVariables(args as Record<string, unknown>);
@@ -55,6 +65,11 @@ export function registerTools(server: Server): void {
       case SCAN_NODES_BY_TYPES:       return handleScanNodesByTypes(args as Record<string, unknown>);
       case GET_FILE_FROM_URL:         return handleGetFileFromUrl(args as Record<string, unknown>);
       case GET_NODE_FROM_URL:         return handleGetNodeFromUrl(args as Record<string, unknown>);
+      case EXTRACT_DESIGN_SYSTEM:     return handleExtractDesignSystem(args as Record<string, unknown>);
+      case ANALYZE_STRUCTURE:         return handleAnalyzeStructure(args as Record<string, unknown>);
+      case GET_COMPONENT_VARIANTS:    return handleGetComponentVariants(args as Record<string, unknown>);
+      case EXPORT_IMAGE:              return handleExportImage(args as Record<string, unknown>);
+      case FIND_ASSETS:              return handleFindAssets(args as Record<string, unknown>);
       default:
         return { content: [{ type: 'text', text: `Unknown tool: ${name}` }], isError: true };
     }

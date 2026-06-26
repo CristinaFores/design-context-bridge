@@ -65,13 +65,15 @@ export function startFigmaBridge(): void {
 
   httpServer.on('error', (err) => {
     if ((err as NodeJS.ErrnoException).code === 'EADDRINUSE') {
-      process.stderr.write(`[figma-bridge] Port ${HTTP_PORT} already in use — sharing store via file\n`);
+      process.stderr.write(`[bridge] Port ${HTTP_PORT} already in use — sharing store via file\n`);
     } else {
-      process.stderr.write(`[figma-bridge] HTTP error: ${err.message}\n`);
+      process.stderr.write(`[bridge] HTTP error: ${err.message}\n`);
     }
   });
 
-  httpServer.listen(HTTP_PORT, () => {
-    process.stderr.write(`[figma-bridge] Listening on http://localhost:${HTTP_PORT}\n`);
+  // Bind to loopback only. The bridge must never be reachable from the LAN:
+  // it relays private design context and accepts state-changing POSTs.
+  httpServer.listen(HTTP_PORT, '127.0.0.1', () => {
+    process.stderr.write(`[bridge] Listening on http://127.0.0.1:${HTTP_PORT}\n`);
   });
 }

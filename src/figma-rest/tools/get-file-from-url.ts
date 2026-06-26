@@ -1,18 +1,18 @@
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { parseFigmaUrl, fetchFile } from '../client.js';
+import { parseFigmaUrl, fetchFile, fetchNodes } from '../client.js';
 
 export const GET_FILE_FROM_URL = 'get_file_from_url';
 
 export const getFileFromUrlDefinition = {
   name: GET_FILE_FROM_URL,
   description:
-    'Fetches a Figma file directly via the Figma REST API using a figma.com URL. Returns pages, top-level frames, and document metadata. Requires FIGMA_ACCESS_TOKEN in the server environment. Use this when you have a Figma link but the plugin is not running.',
+    'Fetches a Figma file via the Figma REST API using a figma.com URL. If the URL includes a node-id (e.g. ?node-id=123-456), returns the full data for that specific node. Otherwise returns the file overview: pages, top-level frames, and metadata. Requires FIGMA_ACCESS_TOKEN.',
   inputSchema: {
     type: 'object' as const,
     properties: {
       url: {
         type: 'string',
-        description: 'Figma file URL, e.g. https://www.figma.com/design/ABC123/My-File',
+        description: 'Figma URL — with or without ?node-id. e.g. https://www.figma.com/design/ABC123/My-File?node-id=123-456',
       },
     },
     required: ['url'],
@@ -24,9 +24,28 @@ export async function handleGetFileFromUrl(args: Record<string, unknown>): Promi
   if (!url) return { content: [{ type: 'text', text: 'Provide a "url" parameter.' }] };
 
   try {
-    const { fileKey } = parseFigmaUrl(url);
-    const file = (await fetchFile(fileKey)) as Record<string, unknown>;
+    const { fileKey, nodeId } = parseFigmaUrl(url);
 
+    // If the URL has a node-id, return that node's full data directly
+    if (nodeId) {
+      const result = (await fetchNodes(fileKey, [nodeId])) as Record<string, unknown>;
+      const nodes = result.nodes as Record<string, unknown> | undefined;
+      const wrapper = nodes?.[nodeId] as Record<string, unknown> | undefined;
+
+      if (!wrapper) {
+        return { content: [{ type: 'text', text: `Node ${nodeId} not found in file ${fileKey}.` }] };
+      }
+
+      const payload = {
+        node: wrapper.document,
+        styles: wrapper.styles ?? {},
+        components: wrapper.components ?? {},
+      };
+      return { content: [{ type: 'text', text: JSON.stringify(payload, null, 2) }] };
+    }
+
+    // No node-id — return file overview
+    const file = (await fetchFile(fileKey)) as Record<string, unknown>;
     const doc = file.document as Record<string, unknown> | undefined;
     const pages = (doc?.children as Array<Record<string, unknown>> | undefined) ?? [];
 

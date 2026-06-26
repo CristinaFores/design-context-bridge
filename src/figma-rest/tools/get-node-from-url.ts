@@ -46,13 +46,21 @@ export async function handleGetNodeFromUrl(args: Record<string, unknown>): Promi
 
     const result = (await fetchNodes(fileKey, [nodeId])) as Record<string, unknown>;
     const nodes = result.nodes as Record<string, unknown> | undefined;
-    const node = nodes?.[nodeId] as Record<string, unknown> | undefined;
+    const wrapper = nodes?.[nodeId] as Record<string, unknown> | undefined;
 
-    if (!node) {
+    if (!wrapper) {
       return { content: [{ type: 'text', text: `Node ${nodeId} not found in file ${fileKey}.` }] };
     }
 
-    return { content: [{ type: 'text', text: JSON.stringify(node, null, 2) }] };
+    // The Figma API wraps the node: { document: <actual node>, components: {}, styles: {} }
+    // Return the actual node document plus the styles/components maps as context
+    const payload = {
+      node: wrapper.document,
+      styles: wrapper.styles ?? {},
+      components: wrapper.components ?? {},
+    };
+
+    return { content: [{ type: 'text', text: JSON.stringify(payload, null, 2) }] };
   } catch (err) {
     return { content: [{ type: 'text', text: `Error: ${(err as Error).message}` }] };
   }
