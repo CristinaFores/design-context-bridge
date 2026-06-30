@@ -6,7 +6,8 @@
     "skipLibCheck": true,
     "typeRoots": [
       "../node_modules/@figma"
-    ]
+    ],
+    "types": ["plugin-typings"]
   },
   "include": ["code.ts"]
 }
