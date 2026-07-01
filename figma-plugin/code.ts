@@ -1,4 +1,4 @@
-figma.showUI(__html__, { width: 280, height: 360, title: 'Design Inspector' });
+figma.showUI(__html__, { width: 280, height: 360, title: 'Frontend Handoff Snapshot' });
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
