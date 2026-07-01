@@ -1,5 +1,5 @@
 "use strict";
-figma.showUI(__html__, { width: 260, height: 220, title: 'Frontend Handoff Snapshot' });
+figma.showUI(__html__, { width: 280, height: 360, title: 'Design Inspector' });
 // ── helpers ───────────────────────────────────────────────────────────────────
 function toHex(n) {
     var h = Math.round(n * 255).toString(16);
@@ -211,8 +211,23 @@ async function extractVariables() {
         };
     });
 }
-// ── send ──────────────────────────────────────────────────────────────────────
-// Nothing is sent to the local handoff tool until the user presses "Sync" in
+// ── inspect broadcast (no network — always runs on selection change) ───────────
+async function broadcastInspect() {
+    var selected = figma.currentPage.selection;
+    var colorMap = {};
+    var texts = [];
+    var spacing = [];
+    selected.forEach(function (n) { collectColors(n, colorMap, 4); });
+    selected.forEach(function (n) { collectTexts(n, texts, 4); });
+    for (var i = 0; i < selected.length; i++)
+        await collectSpacing(selected[i], spacing, 4);
+    var colors = Object.keys(colorMap).map(function (hex) {
+        return { hex: hex, opacity: colorMap[hex].opacity };
+    });
+    figma.ui.postMessage({ type: 'inspect', count: selected.length, colors: colors, texts: texts, spacing: spacing });
+}
+// ── export to local handoff tool (optional, user-initiated) ───────────────────
+// Nothing is sent to the local handoff tool until the user presses "Export" in
 // the UI. This avoids any background network activity without a visible,
 // user-initiated action — only localhost:3055 is ever contacted.
 var retryTimer = null;
@@ -286,10 +301,9 @@ async function sendContext() {
     }, connected ? 10000 : 3000);
 }
 figma.on('selectionchange', function () {
-    if (!syncEnabled) {
-        figma.ui.postMessage({ type: 'status', syncEnabled: false, connected: false, count: figma.currentPage.selection.length });
+    broadcastInspect();
+    if (!syncEnabled)
         return;
-    }
     if (retryTimer !== null) {
         clearTimeout(retryTimer);
         retryTimer = null;
@@ -437,4 +451,5 @@ figma.ui.onmessage = function (msg) {
         figma.ui.postMessage({ type: 'status', syncEnabled: false, connected: false, count: figma.currentPage.selection.length });
     }
 };
+broadcastInspect();
 figma.ui.postMessage({ type: 'status', syncEnabled: syncEnabled, connected: false, count: figma.currentPage.selection.length });
