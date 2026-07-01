@@ -49,11 +49,11 @@ Everything works in **both** modes — choose by workflow, or use both at once.
 
 ### 🔌 Plugin mode
 
-A Figma plugin ("Frontend Handoff Snapshot") runs inside Figma desktop and exports your selection — colors, text, spacing, variables, prototype notes — to the local server on your machine. Nothing is sent until you press **Sync** in the plugin. No token needed.
+A Figma plugin ("Frontend Handoff Snapshot") runs inside Figma desktop. Select any layer and instantly see its **colors, typography, and spacing** in the plugin panel — no token or server needed for inspection. When you're ready, press **Export** to send the full selection context to the local bridge for your AI coding tool.
 
-> The Figma Community plugin is a standalone local handoff/snapshot exporter. It only talks to `localhost` and never modifies your file. It is not Figma's official MCP integration (`use_figma`) and isn't a replacement for it — pairing it with the MCP server below is optional, for developers who want their AI coding tool to read that same exported context.
+> The plugin only talks to `localhost` and never modifies your file. It is not Figma's official MCP integration (`use_figma`) and isn't a replacement for it — pairing it with the MCP server below is optional, for developers who want their AI coding tool to read that same exported context.
 
-→ [Figma Community plugin](https://www.figma.com/community/plugin/1651991638967929445) *(coming soon — pending review)* · [Plugin setup](docs/plugin-setup.md)
+→ [Figma Community plugin](https://www.figma.com/community/plugin/1651991638967929445) *(pending review)* · [Plugin setup](docs/plugin-setup.md)
 
 ### 🌐 REST API mode
 
