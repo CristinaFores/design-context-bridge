@@ -30,6 +30,18 @@
   button.primary { background: #18a247; border-color: #18a247; color: #fff; }
   button:disabled { opacity: 0.5; cursor: default; }
   #note { color: #999; font-size: 10px; line-height: 1.4; }
+  #setup {
+    display: none;
+    margin-top: 8px;
+    padding: 8px 10px;
+    background: #fff8e1;
+    border: 1px solid #ffe082;
+    border-radius: 6px;
+    font-size: 10px;
+    color: #555;
+    line-height: 1.5;
+  }
+  #setup a { color: #0066cc; }
 </style>
 </head>
 <body>
@@ -45,6 +57,11 @@
 </div>
 
 <div id="note">Only sends data to localhost. Does not modify your file.</div>
+<div id="setup">
+  <strong>Local tool not running.</strong><br/>
+  This plugin requires the <em>design-context-bridge</em> package running locally on port 3055.<br/>
+  Install: <a href="https://github.com/CristinaFores/design-context-bridge" target="_blank">github.com/CristinaFores/design-context-bridge</a>
+</div>
 
 <script>
   var dot = document.getElementById('dot');
@@ -52,6 +69,7 @@
   var selectionEl = document.getElementById('selection');
   var syncBtn = document.getElementById('syncBtn');
   var pauseBtn = document.getElementById('pauseBtn');
+  var setupEl = document.getElementById('setup');
 
   syncBtn.onclick = function () {
     parent.postMessage({ pluginMessage: { type: 'sync' } }, '*');
@@ -65,8 +83,11 @@
     if (!msg || msg.type !== 'status') return;
 
     var syncEnabled = !!msg.syncEnabled;
+    var notRunning = syncEnabled && !msg.connected;
+
     syncBtn.disabled = syncEnabled;
     pauseBtn.disabled = !syncEnabled;
+    setupEl.style.display = notRunning ? 'block' : 'none';
 
     if (!syncEnabled) {
       dot.className = 'dot';
