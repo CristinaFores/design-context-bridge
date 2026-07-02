@@ -65,18 +65,33 @@
     font-family: monospace;
   }
   .spacing-name { font-size: 10px; color: #888; margin-bottom: 3px; }
-  /* Export footer */
-  .footer {
-    padding: 8px 12px;
+  /* Optional export panel */
+  .export-panel {
+    padding: 8px 12px 10px;
     border-top: 1px solid #eee;
+    background: #fafafa;
+  }
+  .export-head {
     display: flex;
     align-items: center;
     gap: 6px;
+    margin-bottom: 4px;
   }
   .dot { width: 6px; height: 6px; border-radius: 50%; background: #ccc; flex-shrink: 0; }
   .dot.connected { background: #18a247; }
-  .dot.error { background: #e53e3e; }
-  .export-status { color: #999; font-size: 10px; flex: 1; }
+  .dot.error { background: #e5a03e; }
+  .export-title { font-weight: 600; font-size: 10px; color: #444; }
+  .badge {
+    font-size: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #888;
+    background: #ececec;
+    border-radius: 3px;
+    padding: 1px 5px;
+  }
+  .export-status { color: #888; font-size: 10px; line-height: 1.45; margin-bottom: 6px; }
+  .export-actions { display: flex; gap: 6px; }
   button {
     font-family: inherit; font-size: 10px;
     padding: 4px 8px; border-radius: 4px;
@@ -98,11 +113,17 @@
   <div class="empty">Select a layer to inspect its design properties.</div>
 </div>
 
-<div class="footer">
-  <div class="dot" id="dot"></div>
-  <span class="export-status" id="exportStatus">Export to dev handoff tool</span>
-  <button id="exportBtn" class="primary">Export</button>
-  <button id="stopBtn" disabled>Stop</button>
+<div class="export-panel">
+  <div class="export-head">
+    <div class="dot" id="dot"></div>
+    <span class="export-title">Local handoff export</span>
+    <span class="badge">Optional</span>
+  </div>
+  <div class="export-status" id="exportStatus">Inspecting works with no setup. To export a snapshot, start the local handoff tool on your machine (localhost:3055), then press Export.</div>
+  <div class="export-actions">
+    <button id="exportBtn" class="primary">Export selection</button>
+    <button id="stopBtn" disabled>Stop</button>
+  </div>
 </div>
 
 <script>
@@ -194,13 +215,13 @@
 
     if (!exporting) {
       dot.className = 'dot';
-      exportStatus.textContent = 'Export to dev handoff tool';
+      exportStatus.textContent = 'Inspecting works with no setup. To export a snapshot, start the local handoff tool on your machine (localhost:3055), then press Export.';
     } else if (msg.connected) {
       dot.className = 'dot connected';
-      exportStatus.textContent = 'Exporting…';
+      exportStatus.textContent = 'Connected — exporting your selection to the local handoff tool.';
     } else {
       dot.className = 'dot error';
-      exportStatus.textContent = 'Local tool not running';
+      exportStatus.textContent = 'Waiting for the local handoff tool on localhost:3055. This is expected until you start it — export is optional and everything else keeps working.';
     }
   }
 
