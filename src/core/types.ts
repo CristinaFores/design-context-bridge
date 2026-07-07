@@ -64,6 +64,7 @@ export interface FigmaTextItem {
   characters: string;
   fontSize: number | string;
   fontFamily: string;
+  fontStyle?: string;
 }
 
 export interface FigmaSpacingItem {
