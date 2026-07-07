@@ -1,5 +1,5 @@
 "use strict";
-figma.showUI(__html__, { width: 280, height: 360, title: 'Frontend Handoff Snapshot' });
+figma.showUI(__html__, { width: 300, height: 440, title: 'Frontend Handoff Snapshot', themeColors: true });
 // ── helpers ───────────────────────────────────────────────────────────────────
 function toHex(n) {
     var h = Math.round(n * 255).toString(16);
@@ -61,7 +61,8 @@ function collectTexts(node, out, depth) {
         var t = node;
         out.push({ id: t.id, name: t.name, characters: t.characters,
             fontSize: t.fontSize === figma.mixed ? 'mixed' : t.fontSize,
-            fontFamily: t.fontName === figma.mixed ? 'mixed' : t.fontName.family });
+            fontFamily: t.fontName === figma.mixed ? 'mixed' : t.fontName.family,
+            fontStyle: t.fontName === figma.mixed ? 'mixed' : t.fontName.style });
     }
     if ('children' in node && depth > 0) {
         node.children.forEach(function (c) { collectTexts(c, out, depth - 1); });

@@ -1,4 +1,4 @@
-figma.showUI(__html__, { width: 280, height: 360, title: 'Frontend Handoff Snapshot' });
+figma.showUI(__html__, { width: 300, height: 440, title: 'Frontend Handoff Snapshot', themeColors: true });
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -59,7 +59,8 @@ function collectTexts(node: SceneNode, out: object[], depth: number): void {
     var t = node as TextNode;
     out.push({ id: t.id, name: t.name, characters: t.characters,
       fontSize: t.fontSize === figma.mixed ? 'mixed' : t.fontSize,
-      fontFamily: t.fontName === figma.mixed ? 'mixed' : (t.fontName as FontName).family });
+      fontFamily: t.fontName === figma.mixed ? 'mixed' : (t.fontName as FontName).family,
+      fontStyle: t.fontName === figma.mixed ? 'mixed' : (t.fontName as FontName).style });
   }
   if ('children' in node && depth > 0) {
     (node.children as SceneNode[]).forEach(function (c) { collectTexts(c, out, depth - 1); });

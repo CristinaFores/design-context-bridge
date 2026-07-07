@@ -53,7 +53,9 @@ A Figma plugin ("Frontend Handoff Snapshot") runs inside Figma desktop. Select a
 
 > The plugin only talks to `localhost` and never modifies your file. It is not Figma's official MCP integration (`use_figma`) and isn't a replacement for it — pairing it with the MCP server below is optional, for developers who want their AI coding tool to read that same exported context.
 
-→ [Figma Community plugin](https://www.figma.com/community/plugin/1651991638967929445) *(pending review)* · [Plugin setup](docs/plugin-setup.md)
+The plugin isn't on the Figma Community yet, so you install it manually from the manifest — it takes about a minute and works exactly the same.
+
+→ [Install the plugin manually](docs/plugin-setup.md)
 
 ### 🌐 REST API mode
 
